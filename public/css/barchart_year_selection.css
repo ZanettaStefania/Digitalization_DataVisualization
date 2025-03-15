@@ -1,0 +1,62 @@
+.year-selector, 
+.order-selector,
+.year-selector-map,
+.year-selector-bubblemap
+{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+  
+.year-label,
+.order-label,
+.year-label-map,
+.year-label-bubblemap
+{
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    padding: 8px;
+    margin: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Montserrat';
+    font-size: medium;
+    font-weight: 600;
+    color: #293241;
+}
+  
+.year-label:hover, 
+.order-label:hover,
+.year-label-map:hover,
+.year-label-bubblemap:hover
+{
+    background-color: #f0f0f0;
+}
+  
+input[type="radio"] {
+    display: none; /* Hide the default radio button */
+}
+  
+input[type="radio"]:checked + .year-label {
+    background-color: #5092B8; /* Your selected color */
+    color: #fff;
+}
+
+input[type="radio"]:checked + .year-label-map {
+    background-color: #5092B8; /* Your selected color */
+    color: #fff;
+}
+
+input[type="radio"]:checked + .year-label-bubblemap {
+    background-color: #5092B8; /* Your selected color */
+    color: #fff;
+}
+
+input[type="radio"]:checked + .order-label {
+    background-color: #5092B8; /* Your selected color */
+    color: #fff;
+}

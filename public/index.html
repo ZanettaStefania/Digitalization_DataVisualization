@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags, Title, TailwindCSS CDN -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Project</title>
+    
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+
+    <!-- Font-awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Style -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/barchart_year_selection.css">
+    <link rel="stylesheet" href="./css/collpasible.css">
+
+    <!-- Standard favicon -->
+    <link rel="icon" type="image/x-icon" href="./img/settings.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./img/settings.png">
+
+
+    <!-- Fonts -->
+    <!-- Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Source Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800;900&family=Source+Code+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+    <!-- Scroll to top on reload -->
+    <script>
+        window.onload = function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 0);
+        }
+    </script>
+</head>
+
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav id="nav" class="fixed top-0 left-0 w-full bg-white">
+        <ul class="flex justify-center p-4 text-xl md:mt-5">
+            <li class="mx-4 md:mx-16"><a href="./index.html">Home</a></li>
+            <li class="mx-4 md:mx-16"><a href="./resources.html">Resources</a></li>
+            <li class="mx-4 md:mx-16"><a href="./team.html">Team</a></li>
+        </ul>
+    </nav>
+    
+    
+
+    <!-- Flex Container for Centering Main Content -->
+    <div class="flex items-center justify-center h-screen">
+        <!-- Main Content -->
+        <div class="text-center p-4 lg:p-8">
+            <h1 id="first_title" class="text-4xl md:text-6xl lg:text-8xl">
+                💻 Let's <span id="digitalize">digitalize</span> .
+            </h1>
+            <!-- Slightly larger width div for the paragraph -->
+            <div class="mx-auto mt-4 w-4/5 sm:w-2/2 lg:w-2/3">
+                <p id="first_paragraph" class="text-xl md:text-3xl lg:text-4xl">
+                    Exploring how <span style="color: #5092B8;">digital trends in Europe</span> reshape our daily lives and personal experiences in an ever-connected world.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="arrow bounce">
+        <!-- <a class="fa fa-arrow-down fa-2x" href="#section_title"></a> -->
+        <a href="javascript:void(0);" onclick="scrollToSection()" class="fa fa-arrow-down fa-2x"></a>
+    </div>
+
+    <script>
+        function scrollToSection() {
+            var section = document.getElementById('section_title');
+            var offset = 100; // Adjust this value as needed
+            var sectionTop = section.getBoundingClientRect().top + window.pageYOffset - offset;
+    
+            window.scrollTo({
+                top: sectionTop,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+    
+    <script>
+        const countryMapping = {
+            "AL": "Albania",
+            "AT": "Austria",
+            "BA": "Bosnia and Herzegovina",
+            "BE": "Belgium",
+            "BG": "Bulgaria",
+            "CH": "Switzerland",
+            "CY": "Cyprus",
+            "CZ": "Czechia",
+            "DE": "Germany",
+            "DK": "Denmark",
+            "EE": "Estonia",
+            "EL": "Greece",
+            "ES": "Spain",
+            "EU27_2020": "European Union",
+            "FI": "Finland",
+            "FR": "France",
+            "HR": "Croatia",
+            "HU": "Hungary",
+            "IE": "Ireland",
+            "IS": "Iceland",
+            "IT": "Italy",
+            "LT": "Lithuania",
+            "LU": "Luxembourg",
+            "LV": "Latvia",
+            "ME": "Montenegro",
+            "MK": "North Macedonia",
+            "MT": "Malta",
+            "NL": "Netherlands",
+            "NO": "Norway",
+            "PL": "Poland",
+            "PT": "Portugal",
+            "RO": "Romania",
+            "RS": "Serbia",
+            "SE": "Sweden",
+            "SI": "Slovenia",
+            "SK": "Slovakia",
+            "TR": "Turkey",
+            "UK": "United Kingdom"
+        }
+
+        const internetUseMapping = {
+            "I_IHIF": "Health information",
+            "I_IUIF": "Information for goods and services",
+            "I_IUBK": "Internet banking",
+            "I_IUJOB": "Looking for job / job application",
+            "I_IUVOTE": "Voting or online consultation",
+            "I_IUOLC": "Online course",
+            "I_IUSNET": "Social networks",
+            "I_IUSELL": "Selling goods or services",
+            "I_IUEM": "Sending or receiving emails" 
+        }
+
+        const internetUseMappingColor = {
+            "I_IHIF": { text: "Health information", color: "#53b5ce" }, // Azzurro
+            "I_IUIF": { text: "Information for goods and services", color: "#75c359" }, //green
+            "I_IUBK": { text: "Internet banking", color: "#ff69b4" }, // Pink
+            "I_IUJOB": { text: "Looking for job / job application", color: "#9c27b0 " }, // Purple
+            "I_IUVOTE": { text: "Voting or online consultation", color: "#255be3" }, // Blue
+            "I_IUOLC": { text: "Online course", color: "#547a2a " }, // Dark Verde
+            "I_IUSNET": { text: "Social networks", color: "#ff6700 " }, // Arancione
+            "I_IUSELL": { text: "Selling goods or services", color: "#ebc00b" }, // Yellow
+            "I_IUEM": { text: "Sending or receiving emails", color: "#ff0000" } // Red
+            };
+    </script>
+
+
+    <!-- First Section -->
+    <div class="mt-20 md:mt-20"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="section_title" class="text-5xl text-center">
+            The Dawn of the Digital Era
+        </h2>
+
+        <p id="description" class="text-xl">
+            In this first section we would like to give you an historical of the emergence of computers and the internet as integral parts of our daily lives.
+        </p>
+    </div>
+
+    <!-- Barchart -->
+    <div class="mt-20 md:mt-20"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="plot_title_barchart" class="text-3xl text-center">
+            Individuals that never used Internet in <span style="color: #5092b8;">2012</span>
+        </h2>
+
+        <p id="description" class="text-xl">
+            In the early days of the internet's introduction to households, the majority of people <br> were not connected digitally. <br>
+            Our visualization captures this shift over time, allowing users to explore the percentage of individuals who never used the internet.
+        </p>
+    </div>
+    <div class="flex justify-center items-center ">
+        <div id="my_barchart">
+            <script type="module" src="./js/barchart.js"></script>
+        </div>
+    </div>
+
+    <!-- Year Selector -->
+    <div class="year-selector">
+        <input type="radio" id="year2012" name="year" value="2012" checked>
+        <label for="year2012" class="year-label">2012</label>
+      
+        <input type="radio" id="year2013" name="year" value="2013">
+        <label for="year2013" class="year-label">2013</label>
+
+        <input type="radio" id="year2014" name="year" value="2014">
+        <label for="year2014" class="year-label">2014</label>
+
+        <input type="radio" id="year2015" name="year" value="2015">
+        <label for="year2015" class="year-label">2015</label>
+
+        <input type="radio" id="year2016" name="year" value="2016">
+        <label for="year2016" class="year-label">2016</label>
+
+        <input type="radio" id="year2017" name="year" value="2017">
+        <label for="year2017" class="year-label">2017</label>
+
+        <input type="radio" id="year2018" name="year" value="2018">
+        <label for="year2018" class="year-label">2018</label>
+
+        <input type="radio" id="year2019" name="year" value="2019">
+        <label for="year2019" class="year-label">2019</label>
+
+        <input type="radio" id="year2020" name="year" value="2020">
+        <label for="year2020" class="year-label">2020</label>
+
+        <input type="radio" id="year2021" name="year" value="2021">
+        <label for="year2021" class="year-label">2021</label>
+
+        <input type="radio" id="year2022" name="year" value="2022">
+        <label for="year2022" class="year-label">2022</label>
+      
+      
+        <input type="radio" id="year2023" name="year" value="2023">
+        <label for="year2023" class="year-label">2023</label>
+    </div>
+
+    <!-- Year Selector -->
+    <div class="year-selector">
+        <input type="radio" id="year2012" name="year" value="2012" checked>
+        <label for="year2012" class="year-label">First year</label>
+      
+        <input type="radio" id="year2023" name="year" value="2023">
+        <label for="year2023" class="year-label">Last year</label>
+    </div>
+
+    <!-- Order Selector -->
+    <div class="order-selector">
+        <input type="radio" id="valueOrder" name="order" value="value" checked>
+        <label for="valueOrder" class="order-label">Value Order</label>
+
+        <input type="radio" id="alphabetOrder" name="order" value="alphabet">
+        <label for="alphabetOrder" class="order-label">Alpha Order</label>    
+    </div>
+
+
+    <script type="module">
+        import { updateBarchart } from './js/barchart.js';
+    
+        function updateTitle(year) {
+            const titleBase = "Individuals that never used Internet in";
+            document.getElementById('plot_title_barchart').innerHTML = titleBase + " <span style='color: #5092b8;'>" + year + "</span>";
+        }
+    
+        function updateOrder(order) {
+            updateBarchart(selectedYear, order); 
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var yearSelectors = document.querySelectorAll('.year-label');
+            var orderSelectors = document.querySelectorAll('.order-label');
+            var selectedYear = 2012;
+            var selectedOrder = 'value'; // Default order
+    
+            updateBarchart(selectedYear, selectedOrder); // Initialize with default year and order
+            // Set 2012 and Alphabet Order as the checked values on page load
+            document.getElementById('year2012').checked = true;
+            document.getElementById('valueOrder').checked = true;
+    
+            yearSelectors.forEach(function(label) {
+                label.addEventListener('click', function() {
+                    // Handle the click event for year selection
+                    selectedYear = this.previousElementSibling.value;
+    
+                    updateBarchart(selectedYear, selectedOrder);
+                    updateTitle(selectedYear);
+                });
+            });
+    
+            orderSelectors.forEach(function(label) {
+                label.addEventListener('click', function() {
+                    selectedOrder = this.previousElementSibling.value;
+                    updateBarchart(selectedYear, selectedOrder);
+                });
+            });
+        });
+    </script>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            This chart helps us see how internet became an integral part to our everyday life. <br> <br>
+            By adjusting the year, a clear pattern emerges, allowing us to see that the percentage of people that never used internet decrease dramaticaly. Going from an average of 23% of people in Europe that never used internet in 2012, to the more recent years where we can see that the same average oscillates from 8% to 6%.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_1">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_1">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/view/tin00028/default/table?lang=en" target="_blank">Internet use by individuals</a>
+                </li>
+                <li class="text-xl">
+                    Initially we converted the dataset from tsv to csv then we just polished the dataset by renaming columns and removing specific letters from certain columns names. 
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_1').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_1');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            // Toggle the 'active' class on click
+            this.classList.toggle('active');
+        });
+    </script>
+
+
+
+    <!-- Linechart -->
+    <div class="mt-40 md:mt-40"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="plot_title" class="text-3xl text-center">
+            Increasing presence of computers over time in <span style="color: #5092B8">Europe</span>
+            <!-- Availability of computers in households -->
+        </h2>
+
+        <p id="description" class="text-xl mb-8">
+            Following the previous trend in individuals who never used the internet, <br> our second visualization focuses on the gradual increase in the percentage of households with computers.
+        </p>
+    </div>
+
+    <div class="dropdown" id="dropdown_linechart">
+        <button class="dropbtn">Select State</button>
+        <div class="dropdown-content">
+            <button id="clearAll" class="mt-2 mb-2">Clear All</button> 
+
+            <label><input type="checkbox" name="AT" value="AT" checked>Austria</label>
+            <label><input type="checkbox" name="BE" value="BE">Belgium</label>
+            <label><input type="checkbox" name="BG" value="BG">Bulgaria</label>
+            <label><input type="checkbox" name="CY" value="CY">Cyprus</label>
+            <label><input type="checkbox" name="CZ" value="CZ">Czechia</label>
+            <label><input type="checkbox" name="DE" value="DE">Germany</label>
+            <label><input type="checkbox" name="DK" value="DK">Denmark</label>
+            <label><input type="checkbox" name="EE" value="EE">Estonia</label>
+            <label><input type="checkbox" name="EL" value="EL">Greece</label>
+            <label><input type="checkbox" name="ES" value="ES">Spain</label>
+            <label><input type="checkbox" name="FI" value="FI">Finland</label>
+            <label><input type="checkbox" name="FR" value="FR">France</label>
+            <label><input type="checkbox" name="HR" value="HR">Croatia</label>
+            <label><input type="checkbox" name="HU" value="HU">Hungary</label>
+            <label><input type="checkbox" name="IE" value="IE">Ireland</label>
+            <label><input type="checkbox" name="IS" value="IS">Iceland</label>
+            <label><input type="checkbox" name="IT" value="IT">Italy</label>
+            <label><input type="checkbox" name="LT" value="LT">Lithuania</label>
+            <label><input type="checkbox" name="LU" value="LU">Luxembourg</label>
+            <label><input type="checkbox" name="LV" value="LV">Latvia</label>
+            <label><input type="checkbox" name="MK" value="MK">North Macedonia</label>
+            <label><input type="checkbox" name="MT" value="MT">Malta</label>
+            <label><input type="checkbox" name="NL" value="NL">Netherlands</label>
+            <label><input type="checkbox" name="NO" value="NO">Norway</label>
+            <label><input type="checkbox" name="PL" value="PL">Poland</label>
+            <label><input type="checkbox" name="PT" value="PT">Portugal</label>
+            <label><input type="checkbox" name="RO" value="RO">Romania</label>
+            <label><input type="checkbox" name="RS" value="RS">Serbia</label>
+            <label><input type="checkbox" name="SE" value="SE">Sweden</label>
+            <label><input type="checkbox" name="SI" value="SI">Slovenia</label>
+            <label><input type="checkbox" name="SK" value="SK">Slovakia</label>
+            <label><input type="checkbox" name="TR" value="TR">Türkiye</label>
+            <label><input type="checkbox" name="UK" value="UK">United Kingdom</label>
+        </div>
+    </div>
+
+    <!-- Custom Alert -->
+    <div id="customAlert" class="custom-alert" style="display:none;">
+        <div class="custom-alert-content">
+            <p>Select up to 5 states for a better visualization.</p>
+            <button class="custom-alert-close-btn">Close</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { updateLinechart } from './js/linechart.js';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var linechartDropdown = document.getElementById('dropdown_linechart');
+            var checkedValues = ['AT'];
+            var maxCheckboxes = 5; 
+
+            function showCustomAlert() {
+                document.querySelector('.custom-alert-close-btn').addEventListener('click', function() {
+                    document.getElementById('customAlert').style.display = "none";
+                });
+
+                var modal = document.getElementById('customAlert');
+                modal.style.display = "block";
+
+                var span = modal.getElementsByClassName("custom-alert-close-btn")[0];
+                span.onclick = function() {
+                    modal.style.display = "none";
+                }
+
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+            }
+
+            function updateCheckedValues() {
+                checkedValues = [];
+                var checkboxes = linechartDropdown.querySelectorAll('.dropdown-content input[type="checkbox"]:checked');
+
+                if (checkboxes.length > maxCheckboxes) {
+                    this.checked = false; 
+                    showCustomAlert(); 
+                    return;
+                }
+
+                checkboxes.forEach(function(checkbox) {
+                    checkedValues.push(checkbox.value);
+                });
+
+                var chartContainer = d3.select("#my_linechart");
+                chartContainer.selectAll("*").remove(); 
+
+                updateLinechart(checkedValues);
+            }
+
+            var checkboxes = linechartDropdown.querySelectorAll('.dropdown-content input[type="checkbox"]');
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.value !== 'AT') {
+                    checkbox.checked = false;
+                }
+                checkbox.addEventListener('change', updateCheckedValues);
+            });
+
+            var checkboxAT = linechartDropdown.querySelector('.dropdown-content input[type="checkbox"][value="AT"]');
+            if (checkboxAT) {
+                checkboxAT.checked = true;
+            }
+
+            updateLinechart(checkedValues);
+
+            linechartDropdown.querySelector('#clearAll').addEventListener('click', function() {
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+                updateCheckedValues();
+            });
+
+            updateCheckedValues();
+        });
+    </script> 
+
+    
+
+    <div class="flex justify-center items-center ">
+        <div id="my_linechart">
+            <!-- <script type="module" src="./js/linechart.js"></script> -->
+            <script type="module" src="./js/linechart.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            This line chart illustrates the steady increase in the percentage of households with at least a computer across different years. <br> <br>
+            When expanding the selection to include more countries, it becomes apparent that this trend is consistent across all European countries. 
+            Interestingly, we also observe that countries initially with a lower overall percentage eventually converge to a nearly equal percentage as other countries. <br> <br>
+            To enhance the clarity of the visualization, we opted to limit the simultaneous selection of countries. <br>
+            However, we maintained the always-visible average to provide a reference point, allowing users to gauge whether the selected country falls above or below the European average for that specific year. <br> <br>
+            Just like the previous visualization, it’s clear to see how also technology became an integral part of our everyday life.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_2">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_2">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/view/isoc_ci_cm_h/default/table?lang=en" target="_blank">Households - availability of computers</a>
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the barchart, we had to do minor adjustments: after converting the dataset from tsv to csv we just polished the dataset by renaming columns and removing specific letters from certain columns names. 
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_2').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_2');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        prepButton.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    </script>
+    
+
+
+    <!-- Treemap -->
+    <div class="mt-40 md:mt-40"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="plot_title_treemap" class="text-3xl text-center">
+            Reasons for not having internet access at home in <span style="color: #5092b8;">2010</span> in Europe
+        </h2>
+
+        <p id="description" class="text-xl mb-8">
+            As we observe the rise in household computer adoption, our third visualization delves into the evolving landscape of internet accessibility. <br>
+            The treemap illustrates the primary reasons people did not have access to the internet, offering a comprehensive understanding of the barriers faced or concerns around internet access at home during the past decade.
+        </p>
+    </div>
+
+    <div class="dropdown mb-8" id="dropdown_treemap">
+        <button class="dropbtn">Select Year</button>
+        <div class="dropdown-content">    
+            <label><input type="radio" name="year_treemap" value="2010" checked>2010</label>
+            <label><input type="radio" name="year_treemap" value="2011">2011</label>
+            <label><input type="radio" name="year_treemap" value="2012">2012</label>
+            <label><input type="radio" name="year_treemap" value="2013">2013</label>
+            <label><input type="radio" name="year_treemap" value="2014">2014</label>
+            <label><input type="radio" name="year_treemap" value="2015">2015</label>
+            <label><input type="radio" name="year_treemap" value="2016">2016</label>
+            <label><input type="radio" name="year_treemap" value="2017">2017</label>
+            <label><input type="radio" name="year_treemap" value="2019">2019</label>
+        </div>
+    </div>
+
+    <script type="module">
+        import { updateTreemap } from './js/treemap.js';
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var treemapDropdown = document.getElementById('dropdown_treemap');
+            var checkedValue_treemap = '2010';
+
+            function updateTitleTreemap(year_treemap) {
+                const titleBaseTreemap = "Reasons for not having Internet access at home in";
+                document.getElementById('plot_title_treemap').innerHTML = titleBaseTreemap + " <span style='color: #5092b8;'>" + year_treemap + "</span>" + " in Europe";
+            }
+    
+            // Function to update the value of the checked radio button
+            function updateCheckedValue_treemap() {
+                var checkedRadio_treemap = treemapDropdown.querySelector('.dropdown-content input[type="radio"][name="year_treemap"]:checked');
+                if (checkedRadio_treemap) {
+                    checkedValue_treemap = checkedRadio_treemap.value;
+                }
+        
+                // Call the function to update the chart
+                var chartContainer_treemap = d3.select("#my_treemap");
+                chartContainer_treemap.selectAll("*").remove();     
+
+                updateTreemap(checkedValue_treemap);
+                updateTitleTreemap(checkedValue_treemap);
+            }
+    
+            // Attach change event listeners to radio buttons within the specific dropdown
+            var radioButtons_treemap = treemapDropdown.querySelectorAll('.dropdown-content input[type="radio"][name="year_treemap"]');
+            radioButtons_treemap.forEach(function(radioButton) {
+                radioButton.addEventListener('change', updateCheckedValue_treemap);
+            });
+    
+            // Explicitly set the radio button for Austria to checked
+            // Done for the reload of the page
+            var radio2010 = treemapDropdown.querySelector('.dropdown-content input[type="radio"][name="year_treemap"][value="2010"]');
+            if (radio2010) {
+                radio2010.checked = true;
+            }
+    
+            // Draw the chart for the initially checked value 'AT'
+            updateTreemap(checkedValue_treemap);
+            
+    
+        });
+    </script>
+
+    <div class="flex justify-center items-center ">
+        <div id="my_treemap"  style="margin-top: 5px;">
+            <script type="module" src="./js/treemap.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            Notably, the data presented is an average of European statistics, providing a region-wide perspective. <br>
+            The treemap format allows for a visually intuitive representation, with each segment depicting a specific reason, to delve into the real percentages, you can simply hover on various sections of the chart. <br> <br>
+            Even with a notable decrease in the overall percentage of individuals without never used internet, upon adjusting the year, surprisingly, it becomes apparent that "Not needed" consistently stands out as one of the main reasons cited by people for not having internet access at home. <br> <br>
+            Moreover, over the years, certain barriers, such as "Physical disability," gradually fade away, indicating a significant improvement in accessibility.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_3">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_3">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/view/isoc_pibi_rni/default/table?lang=en" target="_blank">Households - reasons for not having internet access at home</a>
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the previous datasets, at first we converted the dataset from tsv to csv, then we just polished the dataset by renaming columns and removing specific letters from certain columns names.
+                </li>
+                <li class="text-xl">
+                    Once we had the cleaned dataset, we dropped some columns that were not necessary.
+                </li>
+                <li class="text-xl">
+                    We normalized the percetanges to add up to 100%.
+                </li>
+                <li class="text-xl">
+                    For each year column we had a new DataFrame based on the Eurostat Treemap structure, and the result is saved to a new CSV file (treemap_average"year".csv).
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_3').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_3');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            // Toggle the 'active' class on click
+            this.classList.toggle('active');
+        });
+    </script>
+
+
+    <!-- Percent Stacked Barchart -->
+    <div class="mt-40 md:mt-40"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="plot_title_stacked" class="text-3xl text-center">
+            Individuals frequently using Internet in <span style="color: #5092b8;">Austria</span>
+        </h2>
+
+        <p id="description" class="text-xl mb-6">
+            As we witness the increasing adoption of household computers, the fourth visualization explores the evolving landscape of internet utilization habits. <br>
+            Using a percent stacked bar chart, it’s possible to delve into the incremental percentages of individuals who frequently use the internet across different years.
+        </p>
+    </div>
+
+    <div class="dropdown mb-8" id="dropdown_stacked_percent">
+        <button class="dropbtn">Select State</button>
+        <div class="dropdown-content">    
+            <label><input type="radio" name="stacked_state" value="AT" checked>Austria</label>
+            <label><input type="radio" name="stacked_state" value="AL">Albania</label>
+            <label><input type="radio" name="stacked_state" value="BA">Bosnia and Herzegovina</label>
+            <label><input type="radio" name="stacked_state" value="BE">Belgium</label>
+            <label><input type="radio" name="stacked_state" value="BG">Bulgaria</label>
+            <label><input type="radio" name="stacked_state" value="CH">Switzerland</label>
+            <label><input type="radio" name="stacked_state" value="CY">Cyprus</label>
+            <label><input type="radio" name="stacked_state" value="CZ">Czechia</label>
+            <label><input type="radio" name="stacked_state" value="DE">Germany</label>
+            <label><input type="radio" name="stacked_state" value="DK">Denmark</label>
+            <label><input type="radio" name="stacked_state" value="EE">Estonia</label>
+            <label><input type="radio" name="stacked_state" value="EL">Greece</label>
+            <label><input type="radio" name="stacked_state" value="ES">Spain</label>
+            <label><input type="radio" name="stacked_state" value="FI">Finland</label>
+            <label><input type="radio" name="stacked_state" value="FR">France</label>
+            <label><input type="radio" name="stacked_state" value="HR">Croatia</label>
+            <label><input type="radio" name="stacked_state" value="HU">Hungary</label>
+            <label><input type="radio" name="stacked_state" value="IE">Ireland</label>
+            <label><input type="radio" name="stacked_state" value="IS">Iceland</label>
+            <label><input type="radio" name="stacked_state" value="IT">Italy</label>
+            <label><input type="radio" name="stacked_state" value="LT">Lithuania</label>
+            <label><input type="radio" name="stacked_state" value="LU">Luxembourg</label>
+            <label><input type="radio" name="stacked_state" value="LV">Latvia</label>
+            <label><input type="radio" name="stacked_state" value="MK">North Macedonia</label>
+            <label><input type="radio" name="stacked_state" value="MT">Malta</label>
+            <label><input type="radio" name="stacked_state" value="NL">Netherlands</label>
+            <label><input type="radio" name="stacked_state" value="NO">Norway</label>
+            <label><input type="radio" name="stacked_state" value="PL">Poland</label>
+            <label><input type="radio" name="stacked_state" value="PT">Portugal</label>
+            <label><input type="radio" name="stacked_state" value="RO">Romania</label>
+            <label><input type="radio" name="stacked_state" value="RS">Serbia</label>
+            <label><input type="radio" name="stacked_state" value="SE">Sweden</label>
+            <label><input type="radio" name="stacked_state" value="SI">Slovenia</label>
+            <label><input type="radio" name="stacked_state" value="SK">Slovakia</label>
+            <label><input type="radio" name="stacked_state" value="TR">Türkiye</label>
+            <label><input type="radio" name="stacked_state" value="UK">United Kingdom</label>
+        </div>        
+    </div>
+
+    <script type="module">
+        import { updateStacked } from './js/stacked_percent.js';
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var stackedDropdown = document.getElementById('dropdown_stacked_percent');
+            var checkedValue_stacked = 'AT';
+    
+            // Function to update the value of the checked radio button
+            function updateCheckedValue_stacked() {
+                var checkedRadio_stacked = stackedDropdown.querySelector('.dropdown-content input[type="radio"][name="stacked_state"]:checked');
+                if (checkedRadio_stacked) {
+                    checkedValue_stacked = checkedRadio_stacked.value;
+                }
+
+                // Update the title with the selected country name
+                var plotTitle = document.getElementById('plot_title_stacked');
+                if (plotTitle) {
+                    var selectedCountryName = countryMapping[checkedValue_stacked] || 'Austria'; // Default to 'Austria' if the mapping fails
+                    const titleBasePercent = "Individuals frequently using Internet in ";
+                    document.getElementById('plot_title_stacked').innerHTML = titleBasePercent + " <span style='color: #5092b8;'>" + selectedCountryName + "</span>";
+                }
+        
+                // Call the function to update the chart
+                var chartContainer_stacked = d3.select("#my_stacked_barchart");
+                
+                chartContainer_stacked.selectAll("*").remove();     
+                updateStacked(checkedValue_stacked);
+            }
+    
+            // Attach change event listeners to radio buttons within the specific dropdown
+            var radioButtons_stacked = stackedDropdown.querySelectorAll('.dropdown-content input[type="radio"][name="stacked_state"]');
+            // var radioButtons_stacked = stackedDropdown.querySelectorAll('.dropdown-content input[type="radio"]');
+            radioButtons_stacked.forEach(function(radioButton) {
+                radioButton.addEventListener('change', updateCheckedValue_stacked);
+            });
+    
+            // Explicitly set the radio button for Austria to checked
+            // Done for the reload of the page
+            var radioAT_stacked = stackedDropdown.querySelector('.dropdown-content input[type="radio"][name="stacked_state"][value="AT"]');
+            if (radioAT_stacked) {
+                radioAT_stacked.checked = true;
+            }
+    
+            // Draw the chart for the initially checked value 'AT'
+            updateStacked(checkedValue_stacked);
+            
+    
+        });
+    </script>
+
+    <div class="flex justify-center items-center ">
+        <div id="my_stacked_barchart">
+            <script type="module" src="./js/stacked_percent.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            By selecting different countries, a noticeable trend emerges where all countries experience an increase in individuals who frequently use the internet. <br> <br>
+            Most countries surpass the 80% mark in the most recent years, and those initially with a lower overall percentage eventually converge to an almost equal percentage, exceeding 70%. <br> <br>
+            When considering previous percentages presented, it becomes clear that technology not only becomes a more integral part of our home spaces but also occupies an increasing amount of our time.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_4">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_4">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/view/tin00092/default/table?lang=en" target="_blank">Individuals frequently using the internet</a>
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the previous datasets, at first we converted the dataset from tsv to csv, then we just polished the dataset by renaming columns and removing specific letters from certain columns names.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_4').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_4');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    </script>
+    
+
+    <!-- Second Section -->
+    <div class="mt-40 md:mt-40">
+        <h2 id="section_title" class="text-5xl text-center">
+            Evolving Patterns of Internet and Computer Use
+        </h2>
+
+        <p id="description" class="text-xl mb-8">
+            Next, we delve into the dynamic changes in internet usage over time. <br>
+            This part focuses on revealing how the purposes and 
+            frequency of internet use have shifted dramatically. From basic browsing to more complex activities, see how the internet's role in our 
+            lives has transformed.
+        </p>
+
+    </div>
+
+    <!-- Heatmap -->
+    <div class="mt-20 md:mt-20"> 
+        <h2 id="plot_title_heatmap" class="text-3xl text-center">
+            Different use of Internet in <span style="color: #5092b8;">Austria</span>
+        </h2>
+
+        <p id="description" class="text-xl mb-8">
+            Embarking on our journey into evolution of internet usage, the first visualization introduces an heatmap. <br>
+            This graphical representation  enables us to examine the diverse actions performed by individuals on the internet, capturing the shifts in user behavior across different years in a selected country. <br>
+            A more comprehensive overview is also available by choosing the European Union as the selected region.
+        </p>
+    </div>
+
+    <div class="dropdown mb-4" id="dropdown_heatmap">
+        <button class="dropbtn">Select State</button>
+        <div class="dropdown-content">    
+            <label><input type="radio" name="heatmap_state" value="AT" checked>Austria</label>
+            <label><input type="radio" name="heatmap_state" value="AL">Albania</label>
+            <label><input type="radio" name="heatmap_state" value="BA">Bosnia and Herzegovina</label>
+            <label><input type="radio" name="heatmap_state" value="BE">Belgium</label>
+            <label><input type="radio" name="heatmap_state" value="BG">Bulgaria</label>
+            <label><input type="radio" name="heatmap_state" value="CH">Switzerland</label>
+            <label><input type="radio" name="heatmap_state" value="CY">Cyprus</label>
+            <label><input type="radio" name="heatmap_state" value="CZ">Czechia</label>
+            <label><input type="radio" name="heatmap_state" value="DE">Germany</label>
+            <label><input type="radio" name="heatmap_state" value="DK">Denmark</label>
+            <label><input type="radio" name="heatmap_state" value="EE">Estonia</label>
+            <label><input type="radio" name="heatmap_state" value="EL">Greece</label>
+            <label><input type="radio" name="heatmap_state" value="ES">Spain</label>
+            <label><input type="radio" name="heatmap_state" value="EU27_2020">European Union</label>
+            <label><input type="radio" name="heatmap_state" value="FI">Finland</label>
+            <label><input type="radio" name="heatmap_state" value="FR">France</label>
+            <label><input type="radio" name="heatmap_state" value="HR">Croatia</label>
+            <label><input type="radio" name="heatmap_state" value="HU">Hungary</label>
+            <label><input type="radio" name="heatmap_state" value="IE">Ireland</label>
+            <label><input type="radio" name="heatmap_state" value="IS">Iceland</label>
+            <label><input type="radio" name="heatmap_state" value="IT">Italy</label>
+            <label><input type="radio" name="heatmap_state" value="LT">Lithuania</label>
+            <label><input type="radio" name="heatmap_state" value="LU">Luxembourg</label>
+            <label><input type="radio" name="heatmap_state" value="LV">Latvia</label>
+            <label><input type="radio" name="heatmap_state" value="MK">North Macedonia</label>
+            <label><input type="radio" name="heatmap_state" value="MT">Malta</label>
+            <label><input type="radio" name="heatmap_state" value="NL">Netherlands</label>
+            <label><input type="radio" name="heatmap_state" value="NO">Norway</label>
+            <label><input type="radio" name="heatmap_state" value="PL">Poland</label>
+            <label><input type="radio" name="heatmap_state" value="PT">Portugal</label>
+            <label><input type="radio" name="heatmap_state" value="RO">Romania</label>
+            <label><input type="radio" name="heatmap_state" value="RS">Serbia</label>
+            <label><input type="radio" name="heatmap_state" value="SE">Sweden</label>
+            <label><input type="radio" name="heatmap_state" value="SI">Slovenia</label>
+            <label><input type="radio" name="heatmap_state" value="SK">Slovakia</label>
+            <label><input type="radio" name="heatmap_state" value="TR">Turkey</label>
+            <label><input type="radio" name="heatmap_state" value="UK">United Kingdom</label>
+        </div>
+    </div>
+
+    <script type="module">
+        import { updateHeatmap } from './js/heatmap.js';
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var heatmapDropdown = document.getElementById('dropdown_heatmap');
+            var checkedValue_heatmap = 'AT';
+    
+            function updateCheckedValue_heatmap() {
+                var checkedRadio_heatmap = heatmapDropdown.querySelector('.dropdown-content input[type="radio"][name="heatmap_state"]:checked');
+                if (checkedRadio_heatmap) {
+                    checkedValue_heatmap = checkedRadio_heatmap.value;
+                }
+
+                // Update the title with the selected country name
+                var plotTitle = document.getElementById('plot_title_heatmap');
+                if (plotTitle) {
+                    var selectedCountryName = countryMapping[checkedValue_heatmap] || 'Austria'; // Default to 'Austria' if the mapping fails
+
+                    const titleBaseHeatmap = "Different use of Internet in ";
+                    document.getElementById('plot_title_heatmap').innerHTML = titleBaseHeatmap + " <span style='color: #5092b8;'>" + selectedCountryName + "</span>";
+                }
+        
+                // Call the function to update the chart
+                var chartContainer_heatmap= d3.select("#my_heatmap");
+                
+                chartContainer_heatmap.selectAll("*").remove();     
+                updateHeatmap(checkedValue_heatmap);
+            }
+    
+            // Attach change event listeners to radio buttons within the specific dropdown
+            var radioButtons_heatmap = heatmapDropdown.querySelectorAll('.dropdown-content input[type="radio"][name="heatmap_state"]');
+            radioButtons_heatmap.forEach(function(radioButton) {
+                radioButton.addEventListener('change', updateCheckedValue_heatmap);
+            });
+    
+            // Explicitly set the radio button for Austria to checked
+            // Done for the reload of the page
+            var radioAT_heatmap = heatmapDropdown.querySelector('.dropdown-content input[type="radio"][name="heatmap_state"][value="AT"]');
+            if (radioAT_heatmap) {
+                radioAT_heatmap.checked = true;
+            }
+    
+            // Draw the chart for the initially checked value 'AT'
+            updateHeatmap(checkedValue_heatmap);
+        });
+    </script>
+
+    <div class="flex justify-center items-center ">
+        <div id="my_heatmap">
+            <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+            <script type="module" src="./js/heatmap.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            The x-axis illustrates the progression of years, while the y-axis is dedicated to a diverse array of internet actions. <br> <br>
+            The heatmap employs a spectrum of color, with more vibrant hues indicating higher percentages. <br> <br>
+            This design allows us to discern, at a glance, the actions that have experienced significant traction in a given year in the selected country. <br> <br>
+            By selecting different countries, a noticeable trend emerges where most countries exhibit an increase in individuals using the internet for activities such as "Sending or receiving emails," "Social networks," "Information for goods and services," and "Internet banking.” <br>
+            However, most activities show a gradual increment, highlighting the ever-increasing and diversified use of the internet.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_5">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_5">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/explore/all/t_science?lang=en&subtheme=t_isoc.t_isoc_i&display=list&sort=category" target="_blank">ICT usage in households and by individuals </a>
+                    , in the "Internet use" folder from (tin00094) to (tin00103) links.
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the previous datasets, at first we converted the dataset from tsv to csv, then we just polished the dataset by renaming columns and removing specific letters from certain columns names.
+                </li>
+                <li class="text-xl">
+                    Once we had the cleaned dataset, we finalized it by dropping columns that were not necessary.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_5').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_5');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            // Toggle the 'active' class on click
+            this.classList.toggle('active');
+        });
+    </script>
+
+
+    <!-- Pie chart -->
+    <div class="mt-40 md:mt-40"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="plot_title_piechart" class="text-3xl text-center mt-12 mb-4">
+            How the <span style="color: #5092B8;">Top 5</span> uses of Internet has changed over 10 years
+        </h2>
+
+        <p id="description" class="text-xl mb-8">
+            Delving deeper into the evolution of internet usage, our second visualization offeres a focused comparison decade-long comparison of a selected country. <br>
+            This interactive presentation showcases two pie charts, specifically representing the years 2013 and 2023, revealing the top 5 most used internet activities in the chosen country.
+        </p>
+    </div>
+    
+    <div class="dropdown mb-4" id="dropdown_pie">
+        <button class="dropbtn">Select State</button>
+        <div class="dropdown-content">    
+            <label><input type="radio" name="pie_state" value="AT" checked>Austria</label>
+            <label><input type="radio" name="pie_state" value="BE">Belgium</label>
+            <label><input type="radio" name="pie_state" value="BG">Bulgaria</label>
+            <label><input type="radio" name="pie_state" value="CY">Cyprus</label>
+            <label><input type="radio" name="pie_state" value="CZ">Czechia</label>
+            <label><input type="radio" name="pie_state" value="DE">Germany</label>
+            <label><input type="radio" name="pie_state" value="DK">Denmark</label>
+            <label><input type="radio" name="pie_state" value="EE">Estonia</label>
+            <label><input type="radio" name="pie_state" value="EL">Greece</label>
+            <label><input type="radio" name="pie_state" value="ES">Spain</label>
+            <label><input type="radio" name="pie_state" value="EU27_2020">European Union</label>
+            <label><input type="radio" name="pie_state" value="FI">Finland</label>
+            <label><input type="radio" name="pie_state" value="FR">France</label>
+            <label><input type="radio" name="pie_state" value="HR">Croatia</label>
+            <label><input type="radio" name="pie_state" value="HU">Hungary</label>
+            <label><input type="radio" name="pie_state" value="IE">Ireland</label>
+            <label><input type="radio" name="pie_state" value="IT">Italy</label>
+            <label><input type="radio" name="pie_state" value="LT">Lithuania</label>
+            <label><input type="radio" name="pie_state" value="LU">Luxembourg</label>
+            <label><input type="radio" name="pie_state" value="LV">Latvia</label>
+            <label><input type="radio" name="pie_state" value="MT">Malta</label>
+            <label><input type="radio" name="pie_state" value="NL">Netherlands</label>
+            <label><input type="radio" name="pie_state" value="NO">Norway</label>
+            <label><input type="radio" name="pie_state" value="PT">Portugal</label>
+            <label><input type="radio" name="pie_state" value="RO">Romania</label>
+            <label><input type="radio" name="pie_state" value="SE">Sweden</label>
+            <label><input type="radio" name="pie_state" value="SI">Slovenia</label>
+            <label><input type="radio" name="pie_state" value="SK">Slovakia</label>
+            <label><input type="radio" name="pie_state" value="TR">Turkey</label>
+        </div>
+    </div>
+
+    <script type="module">
+        import { updatePiechartRight } from './js/piechart_right.js';
+        import { updatePiechartLeft } from './js/piechart_left.js';
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var pieDropdown = document.getElementById('dropdown_pie');
+            var checkedValue_pie = 'AT';
+    
+            function updateCheckedValue_pie() {
+                var checkedRadio_pie = pieDropdown.querySelector('.dropdown-content input[type="radio"][name="pie_state"]:checked');
+                if (checkedRadio_pie) {
+                    checkedValue_pie = checkedRadio_pie.value;
+                }
+
+                // Update the title with the selected country name
+                var plotTitleRight = document.getElementById('plot_title_piechart_right');
+
+                var plotTitleLeft = document.getElementById('plot_title_piechart_left');
+
+                if (plotTitleRight && plotTitleLeft) {
+
+                    var selectedCountryName = countryMapping[checkedValue_pie] || 'Austria'; // Default to 'Austria' if the mapping fails
+
+                    //plotTitleLeft.textContent = "2013 in " + selectedCountryName;
+                    //plotTitleRight.textContent = "2023 in " + selectedCountryName;
+
+                    const titleBasePieRight = "2023 in ";
+                    document.getElementById('plot_title_piechart_right').innerHTML = titleBasePieRight + " <span style='color: #5092b8;'>" + selectedCountryName + "</span>";
+                    const titleBasePieLeft = "2013 in ";
+                    document.getElementById('plot_title_piechart_left').innerHTML = titleBasePieLeft + " <span style='color: #5092b8;'>" + selectedCountryName + "</span>";
+
+                    
+                }
+        
+                // Call the function to update the chart
+                var chartContainer_pie_right = d3.select("#my_piechart_right");
+                var chartContainer_pie_left = d3.select("#my_piechart_left");
+                
+                chartContainer_pie_right.selectAll("*").remove();     
+                updatePiechartRight(checkedValue_pie);
+
+                chartContainer_pie_left.selectAll("*").remove();     
+                updatePiechartLeft(checkedValue_pie);
+            }
+    
+            // Attach change event listeners to radio buttons within the specific dropdown
+            var radioButtons_pie = pieDropdown.querySelectorAll('.dropdown-content input[type="radio"][name="pie_state"]');
+            radioButtons_pie.forEach(function(radioButton) {
+                radioButton.addEventListener('change', updateCheckedValue_pie);
+            });
+    
+            // Explicitly set the radio button for Austria to checked
+            // Done for the reload of the page
+            var radioAT_pie = pieDropdown.querySelector('.dropdown-content input[type="radio"][name="pie_state"][value="AT"]');
+            if (radioAT_pie) {
+                radioAT_pie.checked = true;
+            }
+    
+            // Draw the chart for the initially checked value 'AT'
+            updatePiechartLeft(checkedValue_pie);
+            updatePiechartRight(checkedValue_pie);
+    
+        });
+    </script>
+
+    
+    <div class="flex-container justify-center items-center">
+        <div id="container_left" style="margin-right: 20px;">
+            <h2 id="plot_title_piechart_left" class="text-3xl text-center">
+                2013 in <span style="color: #5092B8">Austria</span>
+            </h2>
+            <div id="my_piechart_left">
+                <script type="module" src="./js/piechart_left.js"></script>
+            </div>
+        </div>
+        <div id="container_right" style="margin-left: 20px;">
+            <h2 id="plot_title_piechart_right" class="text-3xl text-center">
+                2023 in <span style="color: #5092B8">Austria</span>
+            </h2>
+            <div id="my_piechart_right">
+                <script type="module" src="./js/piechart_right.js"></script>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            The pie charts vividly illustrate the percentages of the internet activities, enabling a side-by-side analysis of the shifts in user behavior. <br> <br>
+            Similarly to the previous visualization, there is also the option to choose a more comprehensive view by selecting the European Union. <br> <br>
+            This visualization provides a simpler comparison of user habits that have either faded away or increased over a significant span of time.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_6">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_6">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/explore/all/t_science?lang=en&subtheme=t_isoc.t_isoc_i&display=list&sort=category" target="_blank">ICT usage in households and by individuals </a>
+                    , in the "Internet use" folder from (tin00094) to (tin00103) links.
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the previous datasets, at first we converted the dataset from tsv to csv, then we just polished the dataset by renaming columns and removing specific letters from certain columns names.
+                </li>
+                <li class="text-xl">
+                    Then we grouped by countries and we kept only data from 2013 and 2023.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_6').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_6');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    </script>
+    
+
+    <!-- Bubblemap -->
+    <div class="mt-40 md:mt-40"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="plot_title_bubblemap" class="text-3xl text-center mt-12 mb-4">
+            Internet used for <span style="color: #53b5ce">Health Information</span> in Europe
+        </h2>
+
+        <p id="description" class="text-xl mb-6">
+            Continuing our exploration of internet habits, the third visualization takes the form of a Bubble Map. <br>
+            This map provides an in-depth exploration of specific internet usage categories, allowing users to focus on a chosen category and a specific year, either 2013 or 2023, just like the previous visualization.
+        </p>
+    </div>
+
+    
+    <!-- Button -->
+    <div class="dropdown mb-6" id="dropdown_bubblemap">
+        <button class="dropbtn">Select Internet Use</button>
+        <div class="dropdown-content">    
+            <label><input type="radio" name="useBubblemap" value="I_IHIF" checked>Health information</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUIF">Information for goods and services</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUBK">Internet banking</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUJOB">Looking for job / job application</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUVOTE">Voting or online consultation</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUOLC">Online course</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUSNET">Social networks</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUSELL">Selling goods or services</label>
+            <label><input type="radio" name="useBubblemap" value="I_IUEM">Sending or receiving emails</label>
+        </div>
+    </div>
+
+    <div class="year-selector-bubblemap">
+        <input type="radio" id="year2013_bubblemap" name="year_bubblemap" value="2013" checked>
+        <label for="year2013_bubblemap" class="year-label-bubblemap">2013</label>
+
+        <input type="radio" id="year2023_bubblemap" name="year_bubblemap" value="2023" checked>
+        <label for="year2023_bubblemap" class="year-label-bubblemap">2023</label>
+    </div>
+
+    <script type="module">
+        import { updateBubbleMap } from './js/bubblemap.js';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var yearSelectors_bubblemap = document.querySelectorAll('.year-selector-bubblemap input[type="radio"]');
+            var selectedYear_bubblemap = '2013'; 
+
+
+            var bubblemapDropdown = document.getElementById('dropdown_bubblemap');
+            var checkedValue_bubblemap = 'I_IHIF';
+
+            document.getElementById('year2013_bubblemap').checked = true;
+
+            updateBubbleMap(checkedValue_bubblemap, selectedYear_bubblemap);
+
+            yearSelectors_bubblemap.forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    selectedYear_bubblemap = this.value;
+                    updateBubbleMap(checkedValue_bubblemap, selectedYear_bubblemap);
+
+                });
+            });
+
+            function updateCheckedValue_bubblemap() {
+                var checkedRadio_bubblemap = bubblemapDropdown.querySelector('.dropdown-content input[type="radio"][name="useBubblemap"]:checked');
+                if (checkedRadio_bubblemap) {
+                    checkedValue_bubblemap = checkedRadio_bubblemap.value;
+                }
+        
+                // Call the function to update the chart
+                var chartContainer_bubblemap = d3.select("#my_bubblemap");
+                chartContainer_bubblemap.selectAll("*").remove(); 
+                
+                var plotTitle = document.getElementById('plot_title_bubblemap');
+                if (plotTitle) {
+                    var selectedInternetUse = internetUseMapping[checkedValue_bubblemap] || 'Health information'; // Default to 'Austria' if the mapping fails
+                    //plotTitle.textContent = "Internet used for " + selectedInternetUse + " in Europe"
+
+                    //const titleBaseBubblemap = "Internet used for " + selectedInternetUse + " in ";
+                    // document.getElementById('plot_title_bubblemap').innerHTML = titleBaseBubblemap + " <span style='color: #5092b8;'> Europe </span>";
+
+                    const titleBaseBubblemap = "Internet used for " + "<span style='color: " + internetUseMappingColor[checkedValue_bubblemap].color + ";'>" + selectedInternetUse + "</span>" + " in ";
+                    document.getElementById('plot_title_bubblemap').innerHTML = titleBaseBubblemap + " Europe";
+                }
+
+                updateBubbleMap(checkedValue_bubblemap, selectedYear_bubblemap);
+            }
+
+            // Attach change event listeners to radio buttons within the specific dropdown
+            var radioButtons_bubblemap = bubblemapDropdown.querySelectorAll('.dropdown-content input[type="radio"][name="useBubblemap"]');
+            radioButtons_bubblemap.forEach(function(radioButton) {
+                radioButton.addEventListener('change', updateCheckedValue_bubblemap);
+            });
+    
+            // Explicitly set the radio button for Austria to checked
+            // Done for the reload of the page
+            var radioHealth = bubblemapDropdown.querySelector('.dropdown-content input[type="radio"][name="useBubblemap"][value="I_IHIF"]');
+            if (radioHealth) {
+                radioHealth.checked = true;
+            }
+    
+            updateBubbleMap(checkedValue_bubblemap, selectedYear_bubblemap);
+        });
+    </script>
+
+    <div class="flex justify-center items-center ">
+        <div id="my_bubblemap">
+            <script type="module" src="./js/bubblemap.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            With the available buttons, viewers can selectively choose both the internet category and the desired year. <br> <br>
+            Each category is assigned a distinct color, and the size of the bubbles adjusts based on the percentage of internet usage within the chosen category and year for a specific country. <br> <br>
+            Hovering over the bubbles provides users with the specific percentage of the selected category's usage in the specified year for the chosen country. <br> <br>
+            Similar to the previous visualization, this bubble map offers a more in-depth analysis, focusing on showing in which areas of the European Union certain actions gain more relevance over time and where they may vary.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_7">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_7">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/explore/all/t_science?lang=en&subtheme=t_isoc.t_isoc_i&display=list&sort=category" target="_blank">ICT usage in households and by individuals </a>
+                    , in the "Internet use" folder from (tin00094) to (tin00103) links.
+                </li>
+                <li class="text-xl">
+                    We started with the already preprossesed dataset of the heatmap. 
+                </li>
+                <li class="text-xl">
+                    Then we mapped the two-letter "geo" codes to three-letter codes from the geojson europe file.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_7').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_7');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    </script>
+
+    
+
+    <!-- Third Section -->
+    <div class="mt-40 md:mt-40"> 
+        <h2 id="section_title" class="text-5xl text-center">
+            The Rise of Digital Skills
+        </h2>
+
+        <p id="description" class="text-xl">
+            The final segment is a comprehensive look at the progression of digital skills. <br>
+            It showcases statistics and insights on how many people are using digital tools, their proficiency levels, and the growth of digital literacy. <br>
+            This section emphasizes the importance of digital skills in today’s world and how they have become 
+            increasingly critical for participation in the digital economy.
+        </p>
+
+    </div>
+
+    
+    <!-- Small multiple barchart -->
+    <div class="mt-20 md:mt-20"> 
+        <h2 id="plot_title_small_multiple" class="text-3xl text-center">
+            Device used in <span style="color: #5092b8;">Austria</span> to access Internet 
+        </h2>
+
+        <p id="description" class="text-xl mb-6">
+            As we shift our focus to the vital realm of digital skills, our first visualization takes the form of a comprehensive multiple barchart. <br>
+            This graphical representation provides an in-depth examination of how individuals access the internet through different devices, showcasing the changes over the years - specifically in 2016, 2018, 2021, and 2023. <br>
+            With a button for the selection of a country and  for each given year, the multiple barcharts provides a nuanced perspective on the changing landscape of internet access devices. Each bar within a chart represents a different device, showcasing the percentages of usage.
+        </p>
+    </div>
+
+    <div class="dropdown mb-8" id="dropdown_small_multiple">
+        <button class="dropbtn">Select State</button>
+        <div class="dropdown-content">    
+            <label><input type="radio" name="state" value="AT" checked>Austria</label>
+            <label><input type="radio" name="state" value="BE">Belgium</label>
+            <label><input type="radio" name="state" value="BG">Bulgaria</label>
+            <label><input type="radio" name="state" value="CY">Cyprus</label>
+            <label><input type="radio" name="state" value="CZ">Czechia</label>
+            <label><input type="radio" name="state" value="DE">Germany</label>
+            <label><input type="radio" name="state" value="DK">Denmark</label>
+            <label><input type="radio" name="state" value="EE">Estonia</label>
+            <label><input type="radio" name="state" value="EL">Greece</label>
+            <label><input type="radio" name="state" value="ES">Spain</label>
+            <label><input type="radio" name="state" value="EU27_2020">European Union</label>
+            <label><input type="radio" name="state" value="FI">Finland</label>
+            <label><input type="radio" name="state" value="FR">France</label>
+            <label><input type="radio" name="state" value="HR">Croatia</label>
+            <label><input type="radio" name="state" value="HU">Hungary</label>
+            <label><input type="radio" name="state" value="IE">Ireland</label>
+            <label><input type="radio" name="state" value="IS">Iceland</label>
+            <label><input type="radio" name="state" value="IT">Italy</label>
+            <label><input type="radio" name="state" value="LT">Lithuania</label>
+            <label><input type="radio" name="state" value="LU">Luxembourg</label>
+            <label><input type="radio" name="state" value="LV">Latvia</label>
+            <label><input type="radio" name="state" value="MK">North Macedonia</label>
+            <label><input type="radio" name="state" value="MT">Malta</label>
+            <label><input type="radio" name="state" value="NL">Netherlands</label>
+            <label><input type="radio" name="state" value="NO">Norway</label>
+            <label><input type="radio" name="state" value="PL">Poland</label>
+            <label><input type="radio" name="state" value="PT">Portugal</label>
+            <label><input type="radio" name="state" value="RO">Romania</label>
+            <label><input type="radio" name="state" value="RS">Serbia</label>
+            <label><input type="radio" name="state" value="SE">Sweden</label>
+            <label><input type="radio" name="state" value="SI">Slovenia</label>
+            <label><input type="radio" name="state" value="SK">Slovakia</label>
+            <label><input type="radio" name="state" value="TR">Türkiye</label>
+
+        </div>
+    </div>
+    
+
+    <script type="module">
+        import { updateSmallMultiple } from './js/small_multiple_barchart.js';
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var smallMultipleDropdown = document.getElementById('dropdown_small_multiple');
+            var checkedValue_barchart = 'AT';
+    
+            // Function to update the value of the checked radio button
+            function updateCheckedValue_barchart() {
+                var checkedRadio = smallMultipleDropdown.querySelector('.dropdown-content input[type="radio"]:checked');
+                if (checkedRadio) {
+                    checkedValue_barchart = checkedRadio.value;
+                }
+
+                // Update the title with the selected country name in the middle of the sentence
+                var plotTitle = document.getElementById('plot_title_small_multiple');
+                if (plotTitle) {
+                    var selectedCountryName = countryMapping[checkedValue_barchart] || 'Austria'; 
+                    document.getElementById('plot_title_small_multiple').innerHTML = "Device used in " + " <span style='color: #5092b8;'>" + selectedCountryName + "</span>" + " to access the Internet";
+                }
+        
+                // Call the function to update the chart
+                var chartContainer = d3.select("#my_multiple_barchart");
+                chartContainer.selectAll("*").remove(); 
+        
+                updateSmallMultiple(checkedValue_barchart);
+            }
+    
+            var radioButtons = smallMultipleDropdown.querySelectorAll('.dropdown-content input[type="radio"][name="state"]');
+
+
+            radioButtons.forEach(function(radioButton) {
+                radioButton.addEventListener('change', updateCheckedValue_barchart);
+            });
+    
+            // Explicitly set the radio button for Austria to checked
+            // Done for the reload of the page
+            var radioAT = smallMultipleDropdown.querySelector('.dropdown-content input[type="radio"][value="AT"]');
+            if (radioAT) {
+                radioAT.checked = true;
+            }
+    
+            // Draw the chart for the initially checked value 'AT'
+            updateSmallMultiple(checkedValue_barchart);
+        });
+    </script>
+    
+    <div class="flex-container">
+        <div id="labels_div" style="margin-top: 50px; width: 200px; height: 350px;">
+            <ul style="list-style: none; padding: 0; margin: 0; width: 100%; height: 100%;">
+                <li style="text-align: right; margin-bottom: 30px; margin-top: 70px; margin-right: 10px;">Desktop computer</li>
+                <li style="text-align: right; margin-bottom: 35px; margin-right: 10px;">Laptop computer</li>
+                <li style="text-align: right; margin-bottom: 35px; margin-right: 10px;">Mobile phone</li>
+                <li style="text-align: right; margin-bottom: 35px; margin-right: 10px;">Other</li>
+                <li style="text-align: right; margin-bottom: 35px; margin-right: 10px;">Tablet</li>
+            </ul>
+        </div>
+        <div id="my_multiple_barchart">
+            <script type="module" src="./js/small_multiple_barchart.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-12 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            For a focused analysis, viewers can select one country at a time enabling a deep dive into the specific preferences within that region, or for a more broad overview it’s possible to select the European union. <br> <br>
+            This visualization not only offers insights into the prevalent devices but also emphasizes the technological shifts that have occurred over the specified years. <br> <br>
+            A noticeable trend emerges as mobile phones gain substantial traction over the years, showcasing a remarkable surge in their usage. In addition, laptop computers also demonstrate growth, albeit at a slightly less dramatic pace. This trend sheds light on the evolving preferences, placing a greater emphasis on the portability of devices.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_8">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_8">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/view/isoc_ci_dev_i/default/table?lang=en" target="_blank">Individuals - devices used to access the internet</a>
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the first datasets, as first step we converted the dataset from tsv to csv, then we just polished the dataset by renaming columns and removing specific letters from certain columns names.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_8').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_8');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            // Toggle the 'active' class on click
+            this.classList.toggle('active');
+        });
+    </script>
+
+
+
+    <!-- Ridgeline -->
+    <div class="mt-40 md:mt-40"> 
+        <h2 id="plot_title_ridgeline" class="text-3xl text-center">
+            Probability distribution of individuals using the mobile phone to access Internet in <span style="color: #5092B8">Europe</span>
+        </h2>
+        <p id="description" class="text-xl mb-6">
+            Continuing our exploration of digital skills, the second visualization employs a ridgeline chart to highlight the remarkable growth in mobile phone usage for internet access. <br>
+            This chart illustrates with continuous curves the probability distribution evolution from 2011 to 2019, mapping the escalating likelihood of mobile device usage.
+        </p>
+    </div>
+
+    <div class="flex justify-center items-center mt-8">
+        <div id="my_ridgeline">
+            <script type="module" src="./js/ridgeline.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            A notable shift becomes apparent: from a modest 19% in 2011 to a considerable 74% in 2019, emphasizing the significant role of mobile phones in internet access. <br> <br>
+            When considering the previously presented percentages, this increase in mobile phone usage appears even more dramatic compared to the slower increase in the usage of other devices.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_9">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_9">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/view/isoc_ci_im_i/default/table?lang=en" target="_blank">Individuals - mobile internet access</a>
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the first datasets, as first step we converted the dataset from tsv to csv, then we just polished the dataset by renaming columns and removing specific letters from certain columns names.
+                </li>
+                <li class="text-xl">
+                    Then we filtered to include only rows where the 'unit' column is equal to 'PC_IND', meaning that we keep the total percentages of individuals.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_9').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_9');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            // Toggle the 'active' class on click
+            this.classList.toggle('active');
+        });
+    </script>
+
+
+
+    <!-- Choropleth Map -->
+    <div class="mt-40 md:mt-40"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="plot_title_map" class="text-3xl text-center">
+            Percentage of individuals with above basic digital skills in <span style="color: #5092b8;">2015</span> in Europe
+        </h2>
+
+        <p id="description" class="text-xl mb-8">
+            Our exploration of digital skills culminates in a Choropleth Map illustrating the geographic distribution of individuals with above-basic digital skills across Europe. <br>
+            This map employs a color gradient to highlight the percentages of individuals possessing above-basic digital skills in specific years: 2015, 2016, 2017, and 2019.
+        </p>
+    </div>
+
+    <div class="year-selector-map">
+        <input type="radio" id="year2015_map" name="year_map" value="2015" checked>
+        <label for="year2015_map" class="year-label-map">2015</label>
+
+        <input type="radio" id="year2016_map" name="year_map" value="2016">
+        <label for="year2016_map" class="year-label-map">2016</label>
+
+        <input type="radio" id="year2017_map" name="year_map" value="2017">
+        <label for="year2017_map" class="year-label-map">2017</label>
+
+        <input type="radio" id="year2019_map" name="year_map" value="2019">
+        <label for="year2019_map" class="year-label-map">2019</label>
+    </div>
+
+    <script type="module">
+        import { updateMap } from './js/map.js';
+
+        
+        function updateTitleMap(year) {
+            const titleBaseMap = "Percentage of individuals with above basic digital skills in";
+            document.getElementById('plot_title_map').innerHTML = titleBaseMap + " <span style='color: #5092b8;'>" + year + "</span>" + " in Europe";
+        }
+        
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Use querySelectorAll to select the radio buttons directly within the 'year-selector-map' class
+            var yearSelectors_map = document.querySelectorAll('.year-selector-map input[type="radio"]');
+            var selectedYear_map = '2015'; 
+
+            // Set 2015 as the checked value on page load
+            document.getElementById('year2015_map').checked = true;
+            updateMap(selectedYear_map);
+
+            yearSelectors_map.forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    selectedYear_map = this.value;
+                    updateMap(selectedYear_map);
+                    updateTitleMap(selectedYear_map);
+                });
+            });
+        });
+    </script>
+
+    <div class="flex justify-center items-center ">
+        <div id="my_map">
+            <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+            <script type="module" src="./js/map.js"></script>
+        </div>
+    </div>
+
+    <div class="mt-8 mb-8 md:mt-8"> 
+        <p id="description" class="text-xl">
+            The map utilizes a color spectrum to convey information, with shades of red indicating lower percentages and shades of green representing higher percentages. <br> <br>
+            Notably, the map not only showcases the growth in the number of greener areas, indicating a rise in digital ability, but also emphasizes the gradual fading of reddish areas. 
+            This shift signals a notable improvement in digital skills, emphasizing the collective progress made in digital literacy across Europe.
+        </p>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="text-center mb-40">
+        <div class="my-4">
+          <!-- Button that controls the collapsible content -->
+          <button class="data_prep" id="toggleButton_10">
+            <i class="fa fa-info-circle"></i>  Data preparation
+          </button>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div style="display: flex; justify-content: center;">
+            <div class="bg-gray-800 p-4 hidden" id="collapsibleContent_10">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li class="text-xl">
+                    The dataset used for this chart is based on the European Union Statistics and can be found here: <br> 
+                    <a id="link" href="https://ec.europa.eu/eurostat/databrowser/view/isoc_sk_dskl_i__custom_9428665/default/table?lang=en" target="_blank">Individuals' level of digital skills</a>
+                </li>
+                <li class="text-xl">
+                    Simirlarly to the first datasets, as first step we converted the dataset from tsv to csv, then we just polished the dataset by renaming columns and removing specific letters from certain columns names.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </div>
+      
+    <script>
+        // JavaScript to toggle the collapsible content
+        document.getElementById('toggleButton_10').addEventListener('click', function() {
+            var content = document.getElementById('collapsibleContent_10');
+            content.classList.toggle('hidden');
+        });
+
+        var prepButton = document.querySelector('.data_prep');
+
+        // Add click event listener
+        prepButton.addEventListener('click', function() {
+            // Toggle the 'active' class on click
+            this.classList.toggle('active');
+        });
+    </script>
+
+
+    <!-- CONCLUSIONS -->
+    <div class="mt-40 mb-60 md:mt-40 mb-60"> <!-- Adjust the margin-top (mt) values as needed -->
+        <h2 id="section_title" class="text-5xl text-center">
+            Conclusions
+        </h2>
+
+        <p id="description" class="text-xl">
+            In summary, we embark on a journey from the early days of limited internet access to the present, where digitalization has become normalized across various aspects of our lives. <br> <br> 
+            Mobile devices, particularly mobile phones, have played a pivotal role in this transformation, witnessing a significant surge in usage for internet access. <br> <br>
+            Technology is quickly evolving, and it appears that people are learning and adapting just as swiftly.
+        </p>
+
+    </div>
+    
+    
+</body>
+</html>

@@ -1,0 +1,50 @@
+body {
+    background-color: #EEEEEE;
+}
+
+#resource_team_title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: #293241;
+    margin-top: 20vh;
+}
+
+#paragraph {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    color: #293241;
+    text-align: center;
+}
+
+#nav {
+    background-color: #EEEEEE;
+    box-shadow: 0 8px 8px rgba(238, 238, 238, 1); /* Adjust the rgba values as needed */
+    z-index: 100;
+}
+ 
+#nav a {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: #293241;
+    transition: color 0.3s; /* Smooth color transition on hover */
+}
+
+#nav a:hover {
+    color: #5092B8; /* Replace with the color you want on hover */
+}
+
+#list {
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    color: #293241;
+}
+
+#link {
+    text-decoration: underline; /* Adds an underline to the link */
+    transition: color 0.3s;
+}
+
+#link:hover {
+    color: #5092B8; /* Change #007bff to the color you want on hover */
+}

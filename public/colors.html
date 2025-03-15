@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Colors</title>
+<style>
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .country {
+    width: 150px;
+    height: 150px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #000;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #fff;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Dynamically generate country divs here -->
+</div>
+<script>
+  const countryMapping = {
+        'AL': {'name': 'Albania', 'color': '#FF6347'},
+        'AT': {'name': 'Austria', 'color': '#4682B4'},
+        'BE': {'name': 'Belgium', 'color': '#32CD32'},
+        'BG': {'name': 'Bulgaria', 'color': '#ffc107'},
+        'CY': {'name': 'Cyprus', 'color': '#c43753'},
+        'CZ': {'name': 'Czechia', 'color': '#FF69B4'},
+        'DE': {'name': 'Germany', 'color': '#04b7c2'},
+        'DK': {'name': 'Denmark', 'color': '#9ACD32'},
+        'EE': {'name': 'Estonia', 'color': '#4169E1'},
+        'EL': {'name': 'Greece', 'color': '#be9b7b'},
+        'ES': {'name': 'Spain', 'color': '#FF8C00'},
+        'EU28': {'name': 'European Union', 'color': '#00a94a'},
+        'FI': {'name': 'Finland', 'color': '#C71585'},
+        'FR': {'name': 'France', 'color': '#6A5ACD'},
+        'HR': {'name': 'Croatia', 'color': '#008B8B'},
+        'HU': {'name': 'Hungary', 'color': '#BDB76B'},
+        'IE': {'name': 'Ireland', 'color': '#556B2F'},
+        'IS': {'name': 'Iceland', 'color': '#9932CC'},
+        'IT': {'name': 'Italy', 'color': '#8B0000'},
+        'LT': {'name': 'Lithuania', 'color': '#E9967A'},
+        'LU': {'name': 'Luxembourg', 'color': '#483D8B'},
+        'LV': {'name': 'Latvia', 'color': '#2F4F4F'},
+        'ME': {'name': 'Montenegro', 'color': '#00CED1'},
+        'MK': {'name': 'North Macedonia', 'color': '#6b0099'},
+        'MT': {'name': 'Malta', 'color': '#FF4500'},
+        'NL': {'name': 'Netherlands', 'color': '#98FB98'},
+        'NO': {'name': 'Norway', 'color': '#ad1a66'},
+        'PL': {'name': 'Poland', 'color': '#82919a'},
+        'PT': {'name': 'Portugal', 'color': '#ff1100'},
+        'RO': {'name': 'Romania', 'color': '#FFC0CB'},
+        'RS': {'name': 'Serbia', 'color': '#DDA0DD'},
+        'SE': {'name': 'Sweden', 'color': '#BC8F8F'},
+        'SI': {'name': 'Slovenia', 'color': '#80c4fb'},
+        'SK': {'name': 'Slovakia', 'color': '#ff6a00'},
+        'TR': {'name': 'Türkiye', 'color': '#8a2879'},
+        'UK': {'name': 'United Kingdom', 'color': '#A0522D'},
+        'XK': {'name': 'Kosovo*', 'color': '#C0C0C0'}
+    }
+
+  const container = document.querySelector('.container');
+
+  Object.entries(countryMapping).forEach(([code, {name, color}]) => {
+    const countryDiv = document.createElement('div');
+    countryDiv.className = 'country';
+    countryDiv.style.backgroundColor = color;
+    countryDiv.innerHTML = `<strong>${name}</strong><br>${color}`;
+    container.appendChild(countryDiv);
+  });
+</script>
+</body>
+</html>

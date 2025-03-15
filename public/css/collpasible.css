@@ -1,0 +1,57 @@
+/* Collapsible content */
+#collapsibleContent_1,
+#collapsibleContent_2,
+#collapsibleContent_3,
+#collapsibleContent_4,
+#collapsibleContent_5,
+#collapsibleContent_6,
+#collapsibleContent_7,
+#collapsibleContent_8,
+#collapsibleContent_9,
+#collapsibleContent_10
+{
+    background-color: #dbdbdb; /* Light grey background */
+    color: #293241; /* Dark text color */
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    width: fit-content;
+    margin-left: 300px;
+    margin-right: 300px;
+    border-radius: 10px;
+  }
+
+  .data_prep{
+    display: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #ea5d55; /* Your selected color */
+    color: #fff;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Montserrat';
+    font-size: medium;
+    font-weight: 600;
+  }
+
+  .data_prep:hover, .data_prep:active {
+    background-color: #ea5d55; /* Darker red for hover and active states */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0); /* Optional: add a shadow for some depth */
+  }
+  
+  /* You'll also need a way to maintain the darker color after the button is clicked.
+  This typically requires JavaScript to toggle a class. Here's an example: */
+  
+  .data_prep.active {
+    background-color: rgb(234, 93, 85); /* Same darker red for the active class */
+  }
+
+  #data_prep{
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    color: #293241;
+  }
